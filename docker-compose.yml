@@ -1,0 +1,87 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+
+  # ── Oracle simulé (MySQL avec schéma Oracle) ─────────────────────────────────
+  oracle_sim:
+    image: mysql:8.0
+    container_name: oracle_sim
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: oracle_db
+      MYSQL_USER: oracle_user
+      MYSQL_PASSWORD: oracle_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./sql/oracle/init_oracle.sql:/docker-entrypoint-initdb.d/init.sql
+      - oracle_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "oracle_user", "-poracle_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── MySQL source ──────────────────────────────────────────────────────────────
+  mysql_source:
+    image: mysql:8.0
+    container_name: mysql_source
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: mysql_db
+      MYSQL_USER: mysql_user
+      MYSQL_PASSWORD: mysql_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./sql/mysql/init_mysql.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "mysql_user", "-pmysql_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── PostgreSQL cible ──────────────────────────────────────────────────────────
+  postgres_target:
+    image: postgres:16
+    container_name: postgres_target
+    environment:
+      POSTGRES_USER: etl_user
+      POSTGRES_PASSWORD: etl_pass
+      POSTGRES_DB: migration_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql/postgres/init_postgres.sql:/docker-entrypoint-initdb.d/init.sql
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U etl_user -d migration_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── ETL Python ────────────────────────────────────────────────────────────────
+  etl:
+    build: .
+    container_name: etl_migration
+    depends_on:
+      oracle_sim:
+        condition: service_healthy
+      mysql_source:
+        condition: service_healthy
+      postgres_target:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./attachments:/app/attachments
+    # En DEV : override CMD pour rester actif et pouvoir exec dedans
+    command: ["python", "main.py"]
+
+volumes:
+  oracle_data:
+  mysql_data:
+  pg_data:
