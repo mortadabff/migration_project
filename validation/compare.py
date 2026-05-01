@@ -28,7 +28,7 @@ def generate_report() -> bool:
         ("Commandes livrées",      'mysql_commandes_livrees', 'pg_commandes_livrees',    0),
         ("CA encaissé (€)",        'mysql_ca_encaisse',       'pg_ca_encaisse',          0.01),
         # PJ
-        ("PJ total",               'mysql_pj_total',          'pg_pj_total',             0),
+        ("PJ total",               'source_pj_total',         'pg_pj_total',             0),
     ]
 
     rows = []

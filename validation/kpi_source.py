@@ -11,6 +11,7 @@ def compute_source_kpis() -> dict:
     ora = oracle_kpis()
     mys = mysql_kpis()
     all_kpis = {**ora, **mys}
+    all_kpis['source_pj_total'] = int(ora.get('oracle_pj_total', 0)) + int(mys.get('mysql_pj_total', 0))
     logger.info(f"KPI SOURCE | {json.dumps(all_kpis, indent=2)}")
 
     # Sauvegarder pour comparaison ultérieure

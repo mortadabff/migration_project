@@ -1,0 +1,18 @@
+{
+  "pg_clients_total": 10,
+  "pg_clients_actifs": 7,
+  "pg_clients_oracle": 10,
+  "pg_contrats_total": 10,
+  "pg_contrats_en_cours": 7,
+  "pg_montant_contrats": 208750.0,
+  "pg_commandes_total": 10,
+  "pg_commandes_livrees": 5,
+  "pg_montant_cmd_ht": 73400.0,
+  "pg_ca_encaisse": 56540.0,
+  "pg_pj_total": 10,
+  "pg_pj_ok": 10,
+  "pg_pj_manquant": 0,
+  "pg_pj_erreur": 0,
+  "pg_clients_email_null": 0,
+  "pg_commandes_sans_client": 0
+}

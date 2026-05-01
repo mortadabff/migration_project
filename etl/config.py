@@ -1,16 +1,45 @@
 # etl/config.py
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def _is_running_in_docker() -> bool:
+    return Path('/.dockerenv').exists()
+
+
+def _resolve_db_host(env_name: str, docker_host: str) -> str:
+    raw_host = os.getenv(env_name, docker_host)
+    if _is_running_in_docker():
+        return raw_host
+    if raw_host == docker_host:
+        return 'localhost'
+    return raw_host
+
+
+def _resolve_db_port(env_name: str, docker_host: str, docker_port: int, host_port: int) -> int:
+    raw_port = int(os.getenv(env_name, docker_port))
+    raw_host = os.getenv(env_name.replace('_PORT', '_HOST'), docker_host)
+
+    if _is_running_in_docker():
+        if raw_host == docker_host and raw_port == host_port:
+            return docker_port
+        return raw_port
+
+    if raw_host == docker_host and raw_port == docker_port:
+        return host_port
+    return raw_port
 
 class Config:
     ENV = os.getenv('ENV', 'dev')
 
     # Oracle (simulé via MySQL)
     ORACLE = {
-        'host': os.getenv('ORACLE_HOST', 'localhost'),
-        'port': int(os.getenv('ORACLE_PORT', 3307)),
+        'host': _resolve_db_host('ORACLE_HOST', 'oracle_sim'),
+        'port': _resolve_db_port('ORACLE_PORT', 'oracle_sim', 3306, 3307),
         'user': os.getenv('ORACLE_USER', 'oracle_user'),
         'password': os.getenv('ORACLE_PASSWORD', 'oracle_pass'),
         'database': os.getenv('ORACLE_DB', 'oracle_db'),
@@ -18,8 +47,8 @@ class Config:
 
     # MySQL source
     MYSQL = {
-        'host': os.getenv('MYSQL_HOST', 'localhost'),
-        'port': int(os.getenv('MYSQL_PORT', 3306)),
+        'host': _resolve_db_host('MYSQL_HOST', 'mysql_source'),
+        'port': _resolve_db_port('MYSQL_PORT', 'mysql_source', 3306, 3306),
         'user': os.getenv('MYSQL_USER', 'mysql_user'),
         'password': os.getenv('MYSQL_PASSWORD', 'mysql_pass'),
         'database': os.getenv('MYSQL_DB', 'mysql_db'),
@@ -27,8 +56,8 @@ class Config:
 
     # PostgreSQL cible
     PG = {
-        'host': os.getenv('PG_HOST', 'localhost'),
-        'port': int(os.getenv('PG_PORT', 5432)),
+        'host': _resolve_db_host('PG_HOST', 'postgres_target'),
+        'port': _resolve_db_port('PG_PORT', 'postgres_target', 5432, 5433),
         'user': os.getenv('PG_USER', 'etl_user'),
         'password': os.getenv('PG_PASSWORD', 'etl_pass'),
         'database': os.getenv('PG_DB', 'migration_db'),

@@ -79,3 +79,43 @@ ENV=recette docker compose up etl
 
 
 
+
+
+-----
+-----
+
+# ÉTAPE 10 — Commandes utiles du quotidien
+
+### Rebuild l'image après modification du code
+docker compose build etl
+
+### Rebuild sans cache (dépendances changées)
+docker compose build --no-cache etl
+
+### Logs d'un conteneur
+docker compose logs -f etl
+docker compose logs -f postgres_target
+
+### Redémarrer uniquement l'ETL (sans recréer les BDs)
+docker compose restart etl
+
+### Arrêter tout proprement
+docker compose down
+
+### Tout effacer (volumes inclus = données BDs supprimées)
+docker compose down -v
+
+### Exécuter une commande dans le conteneur ETL
+docker compose exec etl python -c "from validation.compare import generate_report; generate_report()"
+
+### Voir les KPIs directement dans PostgreSQL
+docker compose exec postgres_target psql -U etl_user -d migration_db \
+  -c "SET search_path TO migration; SELECT * FROM v_kpi_financier;"
+
+### Inspecter le contenu d'une table
+docker compose exec postgres_target psql -U etl_user -d migration_db \
+  -c "SET search_path TO migration; SELECT * FROM clients LIMIT 10;"
+
+### Vérifier les logs de migration
+docker compose exec postgres_target psql -U etl_user -d migration_db \
+  -c "SET search_path TO migration; SELECT * FROM migration_log ORDER BY date_execution DESC;"

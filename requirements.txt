@@ -5,7 +5,6 @@ sqlalchemy==2.0.27
 # Connecteurs DB
 psycopg2-binary==2.9.9
 mysql-connector-python==8.3.0
-cx-Oracle==8.3.0
 
 # Utilitaires
 python-dotenv==1.0.0

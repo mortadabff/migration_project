@@ -1,0 +1,14 @@
+{
+  "oracle_clients_total": 10,
+  "oracle_clients_actifs": 7,
+  "oracle_contrats_total": 10,
+  "oracle_contrats_en_cours": 7,
+  "oracle_montant_contrats": 208750.0,
+  "oracle_pj_total": 5,
+  "mysql_commandes_total": 10,
+  "mysql_commandes_livrees": 5,
+  "mysql_montant_total_ht": 73400.0,
+  "mysql_ca_encaisse": 56540.0,
+  "mysql_pj_total": 5,
+  "source_pj_total": 10
+}

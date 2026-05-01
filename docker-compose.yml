@@ -1,6 +1,4 @@
 # docker-compose.yml
-version: '3.8'
-
 services:
 
   # ── Oracle simulé (MySQL avec schéma Oracle) ─────────────────────────────────
@@ -52,7 +50,7 @@ services:
       POSTGRES_PASSWORD: etl_pass
       POSTGRES_DB: migration_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./sql/postgres/init_postgres.sql:/docker-entrypoint-initdb.d/init.sql
       - pg_data:/var/lib/postgresql/data

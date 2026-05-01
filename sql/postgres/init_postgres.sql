@@ -137,7 +137,7 @@ SELECT
     (SELECT COALESCE(SUM(montant_ht), 0) FROM contrats WHERE statut = 'EN_COURS') AS ca_contrats_actifs,
     (SELECT COUNT(*) FROM commandes)                                        AS total_commandes,
     (SELECT COUNT(*) FROM commandes WHERE statut = 'LIVREE')               AS commandes_livrees,
-    (SELECT COALESCE(SUM(montant_ttc), 0) FROM mouvements_financiers WHERE type_mouvement = 'PAIEMENT' AND statut = 'VALIDE') AS ca_encaisse,
+    (SELECT COALESCE(SUM(montant), 0) FROM mouvements_financiers WHERE type_mouvement = 'PAIEMENT' AND statut = 'VALIDE') AS ca_encaisse,
     (SELECT COALESCE(SUM(montant), 0) FROM mouvements_financiers WHERE type_mouvement = 'FACTURE' AND statut = 'EN_ATTENTE') AS ca_en_attente,
     (SELECT COUNT(*) FROM pieces_jointes)                                   AS total_pj,
     (SELECT COUNT(*) FROM pieces_jointes WHERE statut_migration = 'OK')    AS pj_migrees_ok;
